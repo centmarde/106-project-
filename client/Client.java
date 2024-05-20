@@ -1,121 +1,95 @@
 import java.rmi.Naming;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.sql.PreparedStatement;
-
+import java.util.Scanner;
 
 public class Client {
 
     public static void main(String[] args) {
-        String url = "jdbc:mysql://localhost:3306/rmiproject";
-        String username = "root";
-        String password = "";
-
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, username, password);
-
             Registry registry = LocateRegistry.getRegistry("localhost", 1099);
             RMIInterface remoteObject = (RMIInterface) registry.lookup("RMIInterface");
             remoteObject.displayInfo();
 
-            System.out.println("Connected to the database.");
+            System.out.println("Connected to the RMI server.");
 
-            // Parse and insert students
-            System.out.println("Parsing and inserting students...");
-            StudentParser studentParser = new StudentParser();
-            studentParser.parseAndInsertStudents(connection, "C:/laragon/www/rmiProject/Students.xml");
+            Scanner scanner = new Scanner(System.in);
+            boolean exit = false;
 
-            // Parse and insert courses
-            System.out.println("Parsing and inserting courses...");
-            CourseParser courseParser = new CourseParser();
-            courseParser.parseAndInsertCourses(connection, "C:/laragon/www/rmiProject/Courses.xml");
+            while (!exit) {
+                System.out.println("Enter 1 to add a course, 2 to add a student, 3 to register a student for a course, or 0 to exit:");
+                int choice = scanner.nextInt();
+                scanner.nextLine(); // consume newline
 
-            System.out.println("Data insertion completed.");
+                switch (choice) {
+                    case 1:
+                        addCourse(remoteObject, scanner);
+                        break;
+                    case 2:
+                        addStudent(remoteObject, scanner);
+                        break;
+                    case 3:
+                        registerStudentForCourse(remoteObject, scanner);
+                        break;
+                    case 0:
+                        exit = true;
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                }
+            }
 
-            connection.close();
-            System.out.println("Connection closed.");
+            System.out.println("Client exiting.");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-}
 
-
-abstract class DataParser {
-
-  protected void insertData(Connection connection, String filePath, String tagName, String insertQuery, String[] attributes) {
-    try {
-      Document document = parseXML(filePath);
-      if (document == null) return;
-
-      System.out.println("Root element: " + document.getDocumentElement().getNodeName());
-      NodeList nList = document.getElementsByTagName(tagName);
-      PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
-
-      System.out.println("----------------------------");
-      for (int i = 0; i < nList.getLength(); i++) {
-        Node nNode = nList.item(i);
-        System.out.println("\nCurrent Element: " + nNode.getNodeName());
-        if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-          Element eElement = (Element) nNode;
-
-          for (int j = 0; j < attributes.length; j++) {
-            String value = eElement.getAttribute(attributes[j]);
-            preparedStatement.setString(j + 1, value);
-            System.out.println(attributes[j] + ": " + value);
-          }
-
-          int rowsAffected = preparedStatement.executeUpdate();
-          if (rowsAffected > 0) {
-            System.out.println("Data inserted successfully.");
-          } else {
-            System.out.println("Data insertion failed.");
-          }
+    private static void addCourse(RMIInterface remoteObject, Scanner scanner) {
+        try {
+            System.out.println("Enter course ID:");
+            String courseId = scanner.nextLine();
+            System.out.println("Enter course title:");
+            String courseTitle = scanner.nextLine();
+            System.out.println("Enter course description:");
+            String courseDescription = scanner.nextLine();
+            String response = remoteObject.addCourse(courseId, courseTitle, courseDescription);
+            System.out.println(response);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
     }
-  }
 
-  protected Document parseXML(String filePath) {
-    try {
-      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder builder = factory.newDocumentBuilder();
-      Document document = builder.parse(filePath);
-      document.getDocumentElement().normalize();
-      return document;
-    } catch (Exception e) {
-      e.printStackTrace();
+    private static void addStudent(RMIInterface remoteObject, Scanner scanner) {
+        try {
+            System.out.println("Enter student ID:");
+            String studentId = scanner.nextLine();
+            System.out.println("Enter student name:");
+            String name = scanner.nextLine();
+            System.out.println("Enter student age:");
+            int age = scanner.nextInt();
+            scanner.nextLine(); // consume newline
+            System.out.println("Enter student address:");
+            String address = scanner.nextLine();
+            System.out.println("Enter student contact number:");
+            String contactNumber = scanner.nextLine();
+            String response = remoteObject.addStudent(studentId, name, age, address, contactNumber);
+            System.out.println(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    return null;
-  }
-}
 
-class CourseParser extends DataParser {
-
-  public void parseAndInsertCourses(Connection connection, String filePath) {
-    String insertQuery = "INSERT INTO courses (course_id, course_title, course_description) VALUES (?, ?, ?)";
-    String[] attributes = {"course_id", "course_title", "course_description"};
-    insertData(connection, filePath, "Course", insertQuery, attributes);
-  }
-}
-
-class StudentParser extends DataParser {
-
-  public void parseAndInsertStudents(Connection connection, String filePath) {
-    String insertQuery = "INSERT INTO students (student_id, name, age, address, contact_number) VALUES (?, ?, ?, ?, ?)";
-    String[] attributes = {"student_id", "name", "age", "address", "contact_number"};
-    insertData(connection, filePath, "Student", insertQuery, attributes);
-  }
+    private static void registerStudentForCourse(RMIInterface remoteObject, Scanner scanner) {
+        try {
+            System.out.println("Enter student ID:");
+            String studentId = scanner.nextLine();
+            System.out.println("Enter course ID:");
+            String courseId = scanner.nextLine();
+            String response = remoteObject.registerStudentForCourse(studentId, courseId);
+            System.out.println(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

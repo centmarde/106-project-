@@ -3,9 +3,7 @@ import java.rmi.RemoteException;
 
 public interface RMIInterface extends Remote {
     void displayInfo() throws RemoteException;
-    String getId() throws RemoteException;
-    String getName() throws RemoteException;
-    String getAge() throws RemoteException;
-    String getAddress() throws RemoteException;
-    String getContactNumber() throws RemoteException;
+    public String registerStudentForCourse(String studentId, String courseId) throws RemoteException;
+    String addCourse(String courseId, String courseTitle, String courseDescription) throws RemoteException;
+    String addStudent(String studentId, String name, int age, String address, String contactNumber) throws RemoteException;
 }
