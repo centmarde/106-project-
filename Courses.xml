@@ -1,0 +1,7 @@
+<Courses>
+   
+    <Course course_id="IT16" course_title="INTRODUCTORY DATABASE MANAGEMENT" course_description="A Database Management System (DBMS) is a software system that is designed to manage and organize data in a structured manner." />
+    <Course course_id="IT106" course_title="INTEGRATIVE PROGRAMMING TECHNOLOGIES" course_description="Integrative Programming focuses on the glue that holds systems together It surveys several programming languages including scripting languages as each has different applications to integration." />
+    <Course course_id="ITE17" course_title="ADVANCED DATABASE MANAGEMENT" course_description="Advanced Database Management explores advanced concepts and techniques in database design implementation and management." />
+   
+</Courses>
