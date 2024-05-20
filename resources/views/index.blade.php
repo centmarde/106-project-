@@ -26,23 +26,10 @@
     overflow: hidden;
     position: relative;">
     <div id="br" >
-    <div class="container"> <h1 class="text-center" id="title">Remote Method Invocation</h1>
-    <span class="text-secondary">Put some creativity here..</span>
-    <a href="http://rmiproject.test/home" style="text-decoration: none;"><div class="d-flex justify-content-center mt-2"> <button class="button-87" type="button" role="button">Dashboard</button></div></a>
-    <div class="mt-1">
-       
-                  <a id="ico1" style="text-decoration: none;" href="https://github.com/centmarde" target="blank">
+    <div class="container"> 
+    
 
-                        <i class="text-light ms-2 mt-3 fa fa-github fa-2x" aria-hidden="true"></i>
-                    </a>
-                    <a id="ico2" style="text-decoration: none;" href="https://web.facebook.com/centmarde.campado/" target="blank">
-                        <i class="text-ligh ms-2 mt-3 fa fa-facebook fa-2x" aria-hidden="true"></i>
-                    </a>
-
-                   
-
-
-                </div>
+                <a href="http://rmi2.test/landingPage" style="text-decoration: none;"><div class="d-flex justify-content-center mt-2"> <button class="btn btn-primary" type="button" role="button">Dashboard</button></div></a>
 </div>
    
     <script src="{{ asset('js/app.js') }}"></script>

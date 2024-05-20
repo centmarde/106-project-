@@ -17,7 +17,7 @@ class StudentsController extends Controller
         $enrollment = Enrollment::all();
         $students = Students::all();
         $courses = Courses::all();
-        return view('dashboard', compact('students', 'courses', 'enrollment'));
+        return view('landingPage', compact('students', 'courses', 'enrollment'));
     }
 
     /**

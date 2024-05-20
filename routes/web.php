@@ -18,8 +18,8 @@ use App\Models\Students;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
 });
 
 // Route::get('/dashboard', [ProductsController::class, 'index'])->name('dashboard');
-Route::get('/home', [StudentsController::class, 'index'])->name('dashboard');
+Route::get('/landingPage', [StudentsController::class, 'index'])->name('dashboard');

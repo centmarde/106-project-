@@ -88,7 +88,7 @@
 
         </div>
         <div class="mt-5 gap-2 d-flex justify-content-center" >
-            <a style="text-decoration: none;"  href="http://rmiproject.test/"> <button  class="button-86" type="button" class="mt-3 btn btn-outline-light">Go Back</button></a>
+            <a style="text-decoration: none;"  href="http://rmi2.test/"> <button  class="button-86" type="button" class="mt-3 btn btn-outline-light">Go Back</button></a>
            
         </div>
 

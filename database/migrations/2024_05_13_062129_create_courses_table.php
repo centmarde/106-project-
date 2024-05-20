@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('courses', function (Blueprint $table) {
         
-            $table->string('course_id');
+            $table->string('course_id')->primary();;
             $table->string('course_title');
             $table->string('course_description');
             $table->timestamps();
