@@ -2,19 +2,20 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class Server extends RMIInterfaceImpl {
-
-    protected Server() throws RemoteException {
-        super();
-    }
+public class Server {
 
     public static void main(String[] args) {
         try {
-            Server server = new Server();
-            RMIInterface stub = (RMIInterface) server;
+            // Create instances of your remote objects
+            StudentInterface studentImpl = new Student();
+            CourseInterface courseImpl = new Course();
+            EnrollmentInterface enrollmentImpl = new Enrollment();
 
+            // Bind each remote object to the RMI registry
             Registry registry = LocateRegistry.createRegistry(1099);
-            registry.rebind("RMIInterface", stub);
+            registry.rebind("StudentService", studentImpl);
+            registry.rebind("CourseService", courseImpl);
+            registry.rebind("EnrollmentService", enrollmentImpl);
 
             System.out.println("Server is ready...");
         } catch (RemoteException e) {

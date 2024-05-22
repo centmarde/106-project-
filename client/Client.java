@@ -1,94 +1,124 @@
-import java.rmi.Naming;
+import java.io.File;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Scanner;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class Client {
 
     public static void main(String[] args) {
         try {
             Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-            RMIInterface remoteObject = (RMIInterface) registry.lookup("RMIInterface");
-            remoteObject.displayInfo();
+
+            StudentInterface studentRemoteObject = (StudentInterface) registry.lookup("StudentService");
+            CourseInterface courseRemoteObject = (CourseInterface) registry.lookup("CourseService");
+            EnrollmentInterface enrollmentRemoteObject = (EnrollmentInterface) registry.lookup("EnrollmentService");
 
             System.out.println("Connected to the RMI server.");
-
+            
             Scanner scanner = new Scanner(System.in);
             boolean exit = false;
 
             while (!exit) {
-                System.out.println("Enter 1 to add a course, 2 to add a student, 3 to register a student for a course, or 0 to exit:");
+                System.out.println("Choose an option:");
+                System.out.println("1. Parse Students");
+                System.out.println("2. Parse Courses");
+                System.out.println("3. Parse Enrollments");
+                System.out.println("4. Exit");
                 int choice = scanner.nextInt();
-                scanner.nextLine(); // consume newline
 
                 switch (choice) {
                     case 1:
-                        addCourse(remoteObject, scanner);
+                        addStudentsFromXML(studentRemoteObject);
                         break;
                     case 2:
-                        addStudent(remoteObject, scanner);
+                        addCourseFromXML(courseRemoteObject);
                         break;
                     case 3:
-                        registerStudentForCourse(remoteObject, scanner);
+                        registerStudentsForCoursesFromXML(enrollmentRemoteObject);
                         break;
-                    case 0:
+                    case 4:
                         exit = true;
                         break;
                     default:
-                        System.out.println("Invalid choice. Please try again.");
+                        System.out.println("Invalid choice. Please choose again.");
+                        break;
                 }
             }
+            
+            scanner.close();
 
-            System.out.println("Client exiting.");
         } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private static void addCourse(RMIInterface remoteObject, Scanner scanner) {
+    private static void addStudentsFromXML(StudentInterface remoteObject) {
         try {
-            System.out.println("Enter course ID:");
-            String courseId = scanner.nextLine();
-            System.out.println("Enter course title:");
-            String courseTitle = scanner.nextLine();
-            System.out.println("Enter course description:");
-            String courseDescription = scanner.nextLine();
-            String response = remoteObject.addCourse(courseId, courseTitle, courseDescription);
-            System.out.println(response);
+            File file = new File("C:/laragon/www/RMI2/storage/Students.xml");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(file);
+            NodeList studentList = document.getElementsByTagName("Student");
+            for (int i = 0; i < studentList.getLength(); i++) {
+                Element studentElement = (Element) studentList.item(i);
+                String studentId = studentElement.getAttribute("student_id");
+                String name = studentElement.getAttribute("name");
+                int age = Integer.parseInt(studentElement.getAttribute("age"));
+                String address = studentElement.getAttribute("address");
+                String contactNumber = studentElement.getAttribute("contact_number");
+                String response = remoteObject.addStudent(studentId, name, age, address, contactNumber);
+                System.out.println(response);
+            }
         } catch (Exception e) {
+            System.err.println("Error adding student: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private static void addStudent(RMIInterface remoteObject, Scanner scanner) {
+    private static void registerStudentsForCoursesFromXML(EnrollmentInterface remoteObject) {
         try {
-            System.out.println("Enter student ID:");
-            String studentId = scanner.nextLine();
-            System.out.println("Enter student name:");
-            String name = scanner.nextLine();
-            System.out.println("Enter student age:");
-            int age = scanner.nextInt();
-            scanner.nextLine(); // consume newline
-            System.out.println("Enter student address:");
-            String address = scanner.nextLine();
-            System.out.println("Enter student contact number:");
-            String contactNumber = scanner.nextLine();
-            String response = remoteObject.addStudent(studentId, name, age, address, contactNumber);
-            System.out.println(response);
+            File file = new File("C:/laragon/www/RMI2/storage/Enrollment.xml");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(file);
+            NodeList enrollmentList = document.getElementsByTagName("Enrollment");
+            for (int i = 0; i < enrollmentList.getLength(); i++) {
+                Element enrollmentElement = (Element) enrollmentList.item(i);
+                String enrollmentId = enrollmentElement.getAttribute("Id");
+                String courseId = enrollmentElement.getAttribute("course_id");
+                String studentId = enrollmentElement.getAttribute("student_id");
+                String response = remoteObject.addEnrollment(enrollmentId, courseId, studentId);
+                System.out.println(response);
+            }
         } catch (Exception e) {
+            System.err.println("Error registering students for courses from XML: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private static void registerStudentForCourse(RMIInterface remoteObject, Scanner scanner) {
+    private static void addCourseFromXML(CourseInterface remoteObject) {
         try {
-            System.out.println("Enter student ID:");
-            String studentId = scanner.nextLine();
-            System.out.println("Enter course ID:");
-            String courseId = scanner.nextLine();
-            String response = remoteObject.registerStudentForCourse(studentId, courseId);
-            System.out.println(response);
+            File file = new File("C:/laragon/www/RMI2/storage/Courses.xml");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(file);
+            NodeList courseList = document.getElementsByTagName("Course");
+            for (int i = 0; i < courseList.getLength(); i++) {
+                Element courseElement = (Element) courseList.item(i);
+                String courseId = courseElement.getAttribute("course_id");
+                String courseTitle = courseElement.getAttribute("course_title");
+                String courseDescription = courseElement.getAttribute("course_description");
+                String response = remoteObject.addCourse(courseId, courseTitle, courseDescription);
+                System.out.println(response);
+            }
         } catch (Exception e) {
+            System.err.println("Error adding course: " + e.getMessage());
             e.printStackTrace();
         }
     }
